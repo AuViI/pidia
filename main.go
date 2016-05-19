@@ -2,16 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/auvii/pidia/diaweb"
 	"os"
+	"path"
 )
 
 var (
 	// host = flag.String("h", "localhost", "host to expose server on")
 	port = flag.Uint("p", uint(80), "web service port")
-	dir  = flag.String("d", ".", "directory for local mirror")
-	conf = flag.String("c", fmt.Sprintf("%s/.pidiarc", os.Getenv("HOME")), "configuration file")
+	dir  = flag.String("d", path.Join(os.Getenv("PWD"), "tmp"), "directory for local mirror")
+	conf = flag.String("c", path.Join(os.Getenv("HOME"), ".pidiarc"), "configuration file")
 )
 
 func main() {
