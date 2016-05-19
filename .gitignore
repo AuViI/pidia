@@ -1,3 +1,8 @@
+### PROJECT ###
+/pidia
+/test
+
+### GOLANG ###
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a

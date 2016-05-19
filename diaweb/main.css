@@ -1,0 +1,29 @@
+* {
+    margin : 0;
+    padding : 0;
+}
+body {
+    background-color : #404040;
+    color: white;
+}
+h1 {
+    padding: .4em;
+    text-align: center;
+}
+#show {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100
+}
+#info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 1em 2em 1.3em 2em;
+    background-color: rgba(66, 66, 66, 0.3);
+    font-size: 1.5em;
+    color:rgb(213, 213, 213);
+}

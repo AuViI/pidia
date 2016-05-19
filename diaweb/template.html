@@ -1,0 +1,29 @@
+<html> {{define "SOCKET"}}http://{{.Host}}:{{.Port}}/{{end}}
+    <head>
+        <meta charset="utf-8">
+        <title>PIdia</title>
+        <link rel="stylesheet" href="/r/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <!--
+        Host: {{.Host}}
+        Port: {{.Port}}
+        Save: {{.Config.Directory}}
+        Configs: {{range .Config.CFiles}}
+            {{.}}{{end}}
+        Files: {{range .Config.Files}}
+            {{.Show}} {{.Duration}}{{end}}
+        Recursiv-Read: {{.ReadConfigs}}
+        -->
+        <h1>{{template "SOCKET" .}}</h1>
+        <div id="show">
+
+        </div>
+        {{ if .ReadConfigs }}
+        <div id="info">
+            {{ range .Config.CFiles }}{{.}} {{end}}
+        </div>
+        {{ end }}
+    </body>
+</html>
