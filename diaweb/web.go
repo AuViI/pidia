@@ -39,7 +39,7 @@ type (
 
 const (
 	// DefaultWaitTime is the amount of seconds to wait in between config updates
-	DefaultWaitTime = 120 // Seconds
+	DefaultWaitTime = 600 // Seconds
 )
 
 // NewServer creates new Server instance

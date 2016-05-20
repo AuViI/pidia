@@ -29,6 +29,7 @@ func (c *Configuration) Query(read bool) {
 
 	err := c.addReadConfig(0)
 	if err != nil {
+		fmt.Println("Panic --- now: ", c.CFiles)
 		panic(err)
 	}
 	defer func() {
@@ -106,6 +107,7 @@ func addDir(f *[]MirrorFile, dir string, dur int, c *Configuration) {
 		fmt.Println("Error reading dir:", dir, err)
 		return
 	}
+fileLoop:
 	for _, i := range info {
 		ni := path.Join(dir, i.Name())
 		if i.IsDir() {
@@ -115,6 +117,11 @@ func addDir(f *[]MirrorFile, dir string, dur int, c *Configuration) {
 			if !(i.Name()[0] == '.' || i.Name()[0] == '~') {
 				*f = append(*f, MirrorFile{Remote: ni, Duration: dur})
 			} else if i.Name() == ".pidiarc" {
+				for _, v := range c.CFiles {
+					if v == ni {
+						continue fileLoop
+					} 
+				}
 				c.CFiles = append(c.CFiles, ni)
 			}
 		}

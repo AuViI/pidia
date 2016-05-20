@@ -22,11 +22,6 @@
             {{range .Config.Files}}
             {{.Show}}{{end}}
         </div>
-        {{ if .ReadConfigs }}
-        <div id="info">
-            {{ range .Config.CFiles }}{{.}} {{end}}
-        </div>
-        {{ end }}
         <script type="text/javascript">
             var show = document.getElementById("show")
             var timings = [{{range .Config.Files}}{{.Duration}},{{end}}];
