@@ -55,6 +55,20 @@ func (c *Configuration) Query(read bool) {
 		}
 		addDir(&c.Files, v[1], int(dur))
 	}
+	entries, lerr := ioutil.ReadDir(c.Directory)
+	if lerr != nil {
+		if os.IsNotExist(lerr) {
+			os.Mkdir(c.Directory, os.ModePerm)
+			entries = nil
+		} else {
+			panic(lerr)
+		}
+	}
+	for _, ent := range entries {
+		if !ent.IsDir() {
+			os.Remove(path.Join(c.Directory,ent.Name()))
+		}
+	}
 	for k := range c.Files {
 		c.Files[k].Download(c.Directory, fmt.Sprintf("%04x", k))
 	}
@@ -82,8 +96,18 @@ func addDir(f *[]MirrorFile, dir string, dur int) {
 
 func (m *MirrorFile) Download(ldir string, name string) {
 	// dl to /tmp
-	m.Local = path.Join(ldir, fmt.Sprintf("%s%s", name, path.Ext(m.Remote)))
+	filename := fmt.Sprintf("%s%s", name, path.Ext(m.Remote))
+	m.Local = path.Join(ldir, filename)
 	// cp /tmp$local /ldir$local
+
+	// currently only local dirs/files allowed TODO online download
+	dat, e := ioutil.ReadFile(m.Remote)
+	if e != nil {
+		fmt.Println("could not read", m.Remote,e)
+		return
+	}
+	ioutil.WriteFile(m.Local, dat, os.ModePerm)
+	m.Local = path.Join("/tmp/", filename)
 }
 
 func (m *MirrorFile) Show() string {

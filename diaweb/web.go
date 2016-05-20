@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"io"
 	"path"
 	"sync"
 	"text/template"
@@ -39,7 +40,7 @@ func NewServer(host string, port uint, dir string, config string, readc bool) *S
 		Host: host,
 		Port: port,
 		Config: Configuration{
-			Directory: path.Clean(fmt.Sprintf("%s/%s", os.Getenv("PWD"), dir)),
+			Directory: dir,
 			CFiles:    []string{config},
 			Files:     nil,
 			RWMutex:   new(sync.RWMutex),
@@ -48,6 +49,7 @@ func NewServer(host string, port uint, dir string, config string, readc bool) *S
 	}
 	http.HandleFunc("/", s.Execute)
 	http.HandleFunc("/r/", resourceHandler())
+	http.HandleFunc("/tmp/", genTmpHandler(s))
 	return s
 }
 
@@ -64,6 +66,23 @@ func resourceHandler() func(http.ResponseWriter, *http.Request) {
 		}
 	}
 }
+func genTmpHandler(s *Server) func(http.ResponseWriter, *http.Request){
+	l := s.Config.Directory
+	lock := s.Config.RWMutex
+	return func(w http.ResponseWriter, r *http.Request) {
+		lock.RLock()
+		defer lock.RUnlock()
+		file := r.URL.Path[len("/tmp/"):]
+		fh, err := os.Open(path.Join(l,file))
+		if err != nil {
+			fmt.Fprint(w, "Error",err)
+			fmt.Println("error request",file,err)
+			return
+		}
+		defer fh.Close()
+		io.Copy(w, fh)
+	}
+}
 
 // Start starts configured Server instance
 func (s *Server) Start() {
@@ -73,7 +92,9 @@ func (s *Server) Start() {
 
 func (s *Server) startLocal() {
 	port := fmt.Sprintf(":%d", s.Port)
-	fmt.Println("starting server on port", port)
+	fmt.Println("> starting server on port", port)
+	fmt.Println("> base config\n    ", s.Config.CFiles[0])
+	fmt.Println("> mirror directory\n    ", s.Config.Directory)
 	http.ListenAndServe(port, nil)
 }
 
@@ -86,7 +107,7 @@ func (s *Server) updateLoop() {
 	acnum := 1
 	wsec := time.Duration(50)
 	for {
-		fmt.Printf("Update Server #%d", acnum)
+		fmt.Printf(" ... update Server #%d\n", acnum)
 		acnum++
 		s.Update()
 		time.Sleep(time.Second * wsec)

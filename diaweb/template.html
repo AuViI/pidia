@@ -18,12 +18,48 @@
         -->
         <h1>{{template "SOCKET" .}}</h1>
         <div id="show">
-
+            {{range .Config.Files}}
+            {{.Show}}{{end}}
         </div>
         {{ if .ReadConfigs }}
         <div id="info">
             {{ range .Config.CFiles }}{{.}} {{end}}
         </div>
         {{ end }}
+        <script type="text/javascript">
+            var show = document.getElementById("show")
+            var timings = [{{range .Config.Files}}{{.Duration}},{{end}}];
+            var showEs = show.children;
+            var curr = 0;
+            for (var obj in showEs) {
+                if (showEs.hasOwnProperty(obj)) {
+                    if (curr) {
+                        showEs[obj].className = "hidden";
+                    }
+                    curr++;
+                }
+            }
+            curr = 0;
+            function next() {
+                {{/* enter duration here */}}
+                var cnum = 0;
+                for (var obj in showEs) {
+                    if (showEs.hasOwnProperty(obj)) {
+                        if (cnum == curr){
+                            showEs[obj].className = "hidden";
+                            console.log("out " + cnum);
+                        }
+                        if (cnum == ((curr + 1) % showEs.length)) {
+                            showEs[obj].className = "";
+                            console.log("in  " + cnum);
+                        }
+                        cnum += 1;
+                    }
+                }
+                curr = (curr + 1) % showEs.length
+                setTimeout(next, timings[curr]* 1000)
+            }
+            setTimeout(next,timings[0])
+        </script>
     </body>
 </html>
