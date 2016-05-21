@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/auvii/pidia/diaweb"
 	"os"
 	"path"
+
+	"github.com/auvii/pidia/diaweb"
 )
 
 var (
@@ -16,5 +17,5 @@ var (
 
 func main() {
 	flag.Parse()
-	diaweb.NewServer("localhost", *port, *dir, *conf, false).Start()
+	diaweb.NewServer("localhost", *port, *dir, *conf, true).Start()
 }
