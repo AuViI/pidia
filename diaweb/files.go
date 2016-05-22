@@ -3,14 +3,24 @@ package diaweb
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 )
 
 // Method returns method to call to download the file
+// local being the directory to download into, name being the name of
+// the temporary file.
+// The remote address is read from m.Remote
+// After calling the returned function (Closure) m.Local will be set up
+// correctly
 func (m *MirrorFile) Method(local, name string) func() error {
 	switch {
-	default:
+	case m.Remote[:7] == "http://": // File can be retrieved via http
+		return func() error {
+			return m.httpDownload(local, name)
+		}
+	default: // assume that file can be copied
 		return func() error {
 			return m.localCopy(local, name)
 		}
@@ -27,5 +37,20 @@ func (m *MirrorFile) localCopy(ldir, name string) error {
 	}
 	ioutil.WriteFile(m.Local, dat, os.ModePerm)
 	m.Local = path.Join("/tmp/", filename) // routed path
+	return nil
+}
+
+func (m *MirrorFile) httpDownload(ldir, name string) error {
+	newfile := fmt.Sprintf("%s%s", name, path.Ext(m.Remote))
+	abs := path.Join(ldir, newfile)
+	resp, err := http.Get(m.Remote) // http Get-Request
+	if err != nil {
+		fmt.Println("could not fetch", m.Remote, err)
+		return err
+	}
+	defer resp.Body.Close()
+	data, _ := ioutil.ReadAll(resp.Body)     // read Response Body
+	ioutil.WriteFile(abs, data, os.ModePerm) // write to file
+	m.Local = path.Join("/tmp/", newfile)
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"path"
 	"regexp"
 	"strconv"
+	"time"
 )
 
 const (
@@ -30,6 +31,11 @@ func (c *Configuration) Query(read bool) {
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		// Using the last time the server updated, combined with the amount of "wait time" set
+		// in the updateLoop() function, to tell the client when to refresh.
+		c.LastUpdate = time.Now()
+	}()
 	if read {
 		rallconfig := 1
 		for rallconfig < len(c.CFiles) {
@@ -111,6 +117,7 @@ func addDir(f *[]MirrorFile, dir string, dur int, c *Configuration) {
 	}
 }
 
+// Show returns the html code for the web view
 func (m *MirrorFile) Show() string {
 	ex := path.Ext(m.Remote)
 	switch ex {

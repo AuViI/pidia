@@ -21,6 +21,7 @@ func (s *Server) Execute(w http.ResponseWriter, r *http.Request) {
 	}
 	err := tmpl.Execute(w, s)
 	throw(w, err)
+	s.SetRefresh(w)
 }
 
 func throw(w http.ResponseWriter, e error) (r bool) {
