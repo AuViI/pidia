@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	fileRegexpString = `([\S\.\w]{1,}?\.\w*)\s*([\d]*)\s*?(\n|$)`
+	fileRegexpString = `([\S\.\w:]{1,}?\.\w*)\s*([\d]*)\s*?(\n|$)`
 	dirRegexpString  = `([\/\.\w]*?\/\w*)\s*([\d]*)\s*?(\n|$)`
 )
 
@@ -76,6 +76,10 @@ func (c *Configuration) addReadConfig(cindex int) (err error) {
 		dur, err := strconv.ParseInt(v[2], 10, 32)
 		if err != nil {
 			dur = 10
+		}
+		if v[1][:7] == "http://" {
+			c.Files = append(c.Files, MirrorFile{Remote: v[1], Duration: int(dur)})
+			continue
 		}
 		if !path.IsAbs(v[1]) {
 			v[1] = path.Join(path.Dir(c.CFiles[cindex]), v[1])
