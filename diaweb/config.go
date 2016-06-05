@@ -78,7 +78,7 @@ func (c *Configuration) addReadConfig(cindex int) (err error) {
 		if err != nil {
 			dur = 10
 		}
-		if v[1][:7] == "http://" {
+		if v[1][:4] == "http" {
 			c.Files = append(c.Files, MirrorFile{Remote: v[1], Duration: int(dur)})
 			continue
 		}
@@ -120,7 +120,7 @@ fileLoop:
 				for _, v := range c.CFiles {
 					if v == ni {
 						continue fileLoop
-					} 
+					}
 				}
 				c.CFiles = append(c.CFiles, ni)
 			}
@@ -132,8 +132,11 @@ fileLoop:
 func (m *MirrorFile) Show() string {
 	ex := path.Ext(m.Remote)
 	switch ex {
-	case ".png", ".jpeg", ".jpg", ".gif":
+	case ".png", ".jpeg", ".jpg", ".gif", ".svg":
 		return fmt.Sprintf("<img src=\"%s\">", m.Local)
+	case ".mp4", ".mov", ".avi", ".flv", ".webm", ".mkv", ".ogg", ".ogv", ".gifv", ".wmv":
+		m.Duration = -1
+		return fmt.Sprintf("<video onended='next();'><source src='%s' type='video/%s'></video>", m.Local, ex[1:])
 	default:
 		return fmt.Sprintf("<iframe src=\"%s\"></iframe>", m.Local)
 	}

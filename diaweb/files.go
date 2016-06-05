@@ -16,7 +16,8 @@ import (
 // correctly
 func (m *MirrorFile) Method(local, name string) func() error {
 	switch {
-	case m.Remote[:7] == "http://": // File can be retrieved via http
+	case m.Remote[:7] == "http://", m.Remote[:8] == "https://":
+		// File can be retrieved via http
 		return func() error {
 			return m.httpDownload(local, name)
 		}

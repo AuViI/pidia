@@ -17,7 +17,6 @@
             {{.Show}} {{.Duration}}{{end}}
         Recursiv-Read: {{.ReadConfigs}}
         -->
-        <h1>{{template "SOCKET" .}}</h1>
         <div id="show">
             {{range .Config.Files}}
             {{.Show}}{{end}}
@@ -47,13 +46,18 @@
                         }
                         if (cnum == ((curr + 1) % showEs.length)) {
                             showEs[obj].className = "";
+                            if (showEs[obj].hasAttribute("onended")) {
+                                showEs[obj].play();
+                            }
                             console.log("in  " + cnum);
                         }
                         cnum += 1;
                     }
                 }
-                curr = (curr + 1) % showEs.length
-                setTimeout(next, timings[curr]* 1000)
+                curr = (curr + 1) % showEs.length;
+                if (timings[curr] >= 0) {
+                    setTimeout(next, timings[curr]* 1000);
+                }
             }
             setTimeout(next,timings[0])
         </script>
